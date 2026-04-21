@@ -1,38 +1,87 @@
-# Instructions
-- Create a branch called `technical-challenge` for your work
-- Update readme with instructions on how to run/test your code
+# Doubly Linked List — React Native (Expo)
 
-# Challenge
-## Doubly Linked List - React Version
-We want you to implement a Doubly Linked List (DDL) in React. You will need to build the DDL data structure from scratch and create a visual, interactive representation of it.
+Interactive visualizer for a Doubly Linked List data structure built from scratch with React Native, Expo, and TypeScript.
 
-### What is a Doubly Linked List?
-A Doubly Linked List (DDL) is a linear data structure where each node contains data and two pointers: one to the previous node (`prev`) and one to the next node (`next`). Unlike a singly linked list, you can traverse in both directions. The list has a `head` (first node) and a `tail` (last node), where the head's `prev` is `null` and the tail's `next` is `null`.
+## Prerequisites
 
-### Requirements:
-Build the DDL from scratch (no libraries or built-in data structures) and expose all operations through an interactive UI. Your code should be as performant as possible.
+- Node.js >= 18
+- npm or yarn
+- Expo CLI (`npx expo`)
+- iOS Simulator (macOS) or Android Emulator, or Expo Go on a physical device
 
-- Insert head / Insert tail: Add nodes at the beginning or end of the list.
-- Remove an element: By index or value (your choice).
-- Remove all duplicates: Keep only one occurrence of each value.
-- Search: Return the element's index if found.
-- Size: Display the current count of nodes.
-- Visualize the list: Render nodes and their prev/next connections so the structure is visible.
-- Display state: Show the current head, tail, and size at all times.
+## Getting Started
 
-## Technical Requirements
-- React 18+ with TypeScript
-- Use React hooks for state management
-- Visualize the list using divs, SVG, or whatever works — it doesn't need to be fancy, just clear
-- Feel free to use any styling library (recommended for saving time)
+```bash
+# Clone the repo and switch to the challenge branch
+git clone <repo-url>
+cd ddl-challenge
+git checkout technical-challenge
 
-## React Native Variant
-If this challenge is assigned for a React Native role, implement the solution using React Native components (View, Text, TouchableOpacity, FlatList/ScrollView, TextInput, etc.) instead of HTML elements. The DDL logic, state management, and interactivity expectations remain identical. Your solution should run on a mobile simulator or Expo.
+# Install dependencies
+npm install
 
-# Additional details
-- You have 1 hour for this
-- Make sure the DDL operations work correctlym, that's the most important part.
-- Add comments if you want to explain your approach
-- Once complete, please create a PR, assign yourself as the owner, and add the designated individual as the reviewer.
+# Start the dev server
+npx expo start
+```
 
-Good luck!
+From there press **i** for iOS simulator, **a** for Android emulator, or scan the QR code with Expo Go on your phone.
+
+## Running Tests
+
+```bash
+npm test
+```
+
+## Project Structure
+
+```
+├── App.tsx                                # Root component
+├── src/
+│   ├── data-structures/
+│   │   └── DoublyLinkedList.ts            # Pure TS linked list (no React deps)
+│   ├── hooks/
+│   │   └── useDoublyLinkedList.ts         # React hook wrapping the DDL
+│   ├── components/
+│   │   ├── NodeCard.tsx                   # Single node visual
+│   │   ├── ArrowConnector.tsx             # Bidirectional arrow between nodes
+│   │   ├── ListVisualizer.tsx             # Horizontal scrollable chain
+│   │   ├── ListStateDisplay.tsx           # Head / Tail / Size bar
+│   │   ├── OperationsPanel.tsx            # Inputs and action buttons
+│   │   └── SearchResult.tsx               # Search feedback banner
+│   └── types/
+│       └── index.ts                       # Shared TypeScript interfaces
+└── README.md
+```
+
+## Features
+
+| Operation          | Description                                         | Complexity |
+| ------------------ | --------------------------------------------------- | ---------- |
+| Insert Head        | Add a node at the beginning of the list             | O(1)       |
+| Insert Tail        | Add a node at the end of the list                   | O(1)       |
+| Remove at Index    | Remove a node by its position                       | O(n)       |
+| Remove Duplicates  | Keep only the first occurrence of each value        | O(n)       |
+| Search             | Find a value and return its index                   | O(n)       |
+| Size               | Display the current node count                      | O(1)       |
+| Clear              | Remove all nodes                                    | O(1)       |
+
+The list state (head, tail, size) is always visible at the top of the screen. The visualizer renders each node with its `prev`/`next` pointers, index label, and HEAD/TAIL badges. Search results highlight the matched node in the visualizer.
+
+## Architecture Decisions
+
+**Pure data structure class** — `DoublyLinkedList.ts` has zero React imports. It can be unit tested independently and reused outside the UI layer.
+
+**useRef + snapshot pattern** — The mutable DDL instance lives in a `useRef` to avoid cloning on every operation. A `syncState()` helper extracts a plain serializable snapshot (`toArray()`, head, tail, size) that triggers React re-renders only when needed.
+
+**React.memo on presentational components** — `NodeCard`, `ArrowConnector`, `ListVisualizer`, `ListStateDisplay`, and `SearchResult` are memoized to skip unnecessary re-renders when props haven't changed.
+
+**Bidirectional traversal** — `getNodeAtIndex` starts from whichever end is closer (head or tail), cutting worst-case traversal time in half.
+
+**Single-pass duplicate removal** — Uses a `Set` for O(1) lookups during a single O(n) traversal, capturing `next` before removing the current node to keep iteration safe.
+
+## Tech Stack
+
+- React Native + Expo (TypeScript)
+- React hooks for state management
+- StyleSheet API (no external styling libraries)
+- Catppuccin Mocha color palette
